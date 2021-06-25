@@ -1,0 +1,9 @@
+numpy 공부 시작
+
+kreas 는 numpy와 결합이 된 메서드 느낌?
+
+numpy자료에서 softmax . 한국이 이길 수 있는 확률 전혀 답도 다르고 이해도 못함 ㅠㅠㅠㅠㅠ
+
+.argument도 모르겟음. softmax안의 내용...
+
+exp.
