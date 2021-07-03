@@ -1,0 +1,63 @@
+select 'hello, world';
+select 1+2;
+select*from country;
+select * from country order by name;
+select count(*) From country;
+select * from country order by name limit 5;
+select * from country order by name limit 5 offset 5;
+
+select * from country order by code;
+select name, code, region, population from country order by code;
+select name as country, code from country order by code;
+(-> 네임으로 정렬하겟다?);
+select name as country, population / 1000 as 'pop(1000s)' from country;
+pragma table_info(country);
+
+select name From country;
+select name From country order by Name;
+select name From country order by Name DESC;
+select name From country order by Name ASC;
+
+select name,Continent From country order by continent, name;
+select name,Continent From country order by name, continent;
+
+select name,Continent From country order by continent DESC, name;
+select name,Continent From country order by name DESC, continent;
+select name,Continent From country order by name DESC;
+select name,Continent From country order by continent DESC;
+select continent From country;
+(맨 뒤에 오는 것은 이미 정렬된 내용안에서 정렬을 해주려는 건가봄.);
+
+
+
+select name, continent, population from country Where population <100000 order by population DESC;
+select name, continent, population from country Where population <100000 and continent = 'Oceania' order by population DESC;
+select name, population from country Where population between 100000 and 10000000 order by population DESC;
+
+
+
+select name, continent from country where name like '%island';
+select name, continent from country where name like 'island%';
+select name, continent from country where name like '%island%';
+select name, continent from country where name like '_a%';
+select name, continent from country where name like '__a%';
+select name, continent from country where name like '_a_u%';
+
+select name, continent from country where continent in ('Europe','Asia');
+select name, continent from country where continent like '_c%';
+
+
+select countrycode, name from city;
+select Distinct countrycode from city;
+select count(countrycode) from city;
+select count(Distinct countrycode) from city;
+
+
+select code, name, continent from country;
+select name from (select code, name, continent from country);
+select distinct countrycode from city;
+select count(*) from (select distinct countrycode from city);
+select count(Distinct countrycode) from city;
+(차이는 열의 이름밖에 없나봄);
+
+
