@@ -1,0 +1,51 @@
+장고를 켜면
+
+파이썬 앱파일 하나를 만들기 위해서는
+맨 하단에 Terminal를 누른뒤 나오는 명령어 창에
+python manage.py startapp accountapp 를 작성한다.
+
+그런다음 이 앱을 활용하기 위해서는 setting.py를 열어서 
+INSTALLED_APPS =[ ] 안에 accountapp을 넣어준다.
+
+
+이제 accountapp 폴더 안에서 views.py를 켜서 
+def hello_world(request):
+    return HttpResponse 
+를 적어주고 alt + enter 해서 적용해준다.
+
+
+urls.py 로 넘어와서
+path('admin/', admin.site.urls), 아래에
+path('accounts/', include('accountapp.urls')) 를 작성한다.
+
+
+그런 다음 accountapp 폴더 마우스 오른쪽 클릭 후 
+New -> python file 를 클릭하여 파일명을 urls를 작성해서 만들어준다.
+
+
+만들어진 accountapp\urls.py 파일에
+
+app_name = 'accountapp'
+urlpatterns = {
+    path('hello_world/', hello_world, name='hello_world'),}
+
+를 작성한 후, 빨간 밑줄이 그어진 부분에 alt+enter를 누르고 장고로 지정해준다.
+그러면 아래 창에 http://127.0.0.1:8000/ 과같은 주소가 나오는데 클릭해준다.
+들어가면 Page not found가 나오는데! 이를 정확하게 들어가기 위해서는 
+주소창에 http://127.0.0.1:8000/accounts/hello_world/ 로 수정해서 적어주면
+
+Hello world 라는 문구가 나온다.
+
+
+
+
+------------------------------------------
+우상단 프로젝트 이름의 역삼각형을 누르면 설정 변경 가능
+눌러서 edit들어가면
+
+host옆에 port가 있음 이것을 8000이든 9000으로 변경가능
+
+(8001대로 바꿔서 연습하래)
+
+-----------------------
+vcs 들어가서 맨위에꺼 enable version control integration 하고 깃설치함
