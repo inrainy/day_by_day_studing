@@ -1,0 +1,100 @@
+7.2웹 어플
+
+인에이플 창? 도움말 위에 있는 거까지 누르면 빨갛게 변함
+==>깃이라는 도구모음에 enable깃이 있음
+
+setting.py에 secret_key가 있음.
+이걸 지켜줘야 하는 방법을 찾을듯
+
+전체 폴더에서 new누르고 새 파일 만들어주는데, 별다른 건 안함
+.env라고 그냥 명명함.
+
+여기다가 셋팅의 시크릿키 넣어줌
+'이나 스페이스 다떼주기
+
+셋팅에 env를 적어 넣고,
+파일은 하나 들여올거임 local_env
+env_list = dict()
+local_env = open(os.path.join(BASE_DIR, 'env'))
+
+
+while True:
+    line = local_env.readline()
+    if not line:
+        break
+
+이걸 적어줘야함
+파일에 도착했을 때 이프문을 찾아 나가라
+
+while True:
+    line = local_env.readline()
+    if not line:
+        break
+    line = line.replace('\n', '')
+    start = line.find('=')
+    key = line[:start]
+    value = line[start+1:]
+    env_list[key] = value
+
+로 완성형 적어줌
+
+.dot it ignore업로드 된 파일 자료 (구글드라이브X 슬랙)
+
+(path - 경로)
+
+
+=========================
+
+git 도구의 commit누르기
+
+모두 선택하고 15~16파일들
+
+commit메세지 남기고, 업로드
+
+=>
+
+git도구모음에 push누르기
+
+깃 허브 주소를 올려야함
+
+
+define remote해줘야함
+
+여기에
+
+https://github.com/inrainy/gis_web_application.git
+
+이주소 내껑미 올리면
+
+오른쪽에 초록색으로 다 뜨고
+
+push  누르면 끝
+
+대충 깃이랑 연동 1회성인듯
+
+==========================
+
+templates폴더에서 html새 파일 만들어줌
+<h1>Test</h1>
+
+같은걸 html배웠을 때부터 넣어줌
+
+view파일로 들어가서
+def hello_world(request):
+    return render(request, 'base.html')
+바꿔주고 commit, push해주면 됨
+
+============
+html에 알트 쉬프트 마우스로 드래그해주면 연속 적으로 작업 가능
+
+
+header
+footer
+head
+
+상위폴더에서 template - 폴더
+다음 template - accountapp -폴더
+다음 거기에 html 파일만들어서 내용틀만들고(1)
+
+view.py에서
+base를 (1) html파일로 넣어줘야함!
