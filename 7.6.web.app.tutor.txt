@@ -1,0 +1,61 @@
+7.6 web.app
+
+-템플릿 폴더를 구태여 하나 만들어 준 이유
+장고가 템플릿 폴더를 찾는 경로를 인식해야함.
+view페이지에 들어가는 html 경로 작성 공간에
+
+앞으로 여러가지 앱을 만들건데, 가져온 html이
+어디서 가져온지 모르는 파일이 되어있는 거임
+accountapp/hello_world 가 되서 관리가 편하게 됨
+
+
+
+
+-header랑 footer을 꾸며줄거임
+<div>
+<span>
+<h5>
+<div style = "text-align: center">
+이런거 정도 써주고 git에 commit + upload까지 함
+
+
+-commit 다시하고 싶을 때
+도구모음 -> git -> reset head -> soft랑 mixed 확인하면서 Head~1리셋해주면 됨! ->다시 커밋 변경할 수 있게 됨
+
+
+
+=========================
+
+bootstrap 들어가서 GETstart
+introduction -> css카피
+
+head페이지 들어가서
+title밑에 부트스트랩 링크 넣기
+
+
+
+header에 들어가서 1번째 분할 div에 마진 넣어주는데
+2rem 0이면
+상하에 2rem 마진 적용된다 0은 좌우인데 0임
+
+
+footer에도 <h5>위 div 똑같이 ;마진 1.5 / 0
+
+
+base로 들어가서 가로줄을 만들어 줄 것임
+원하는 위치에 <hr>
+
+header&footer 로 들어가서 마진 바텀을 적용
+
+
+-->구글 폰트 들어가서 오픈소스 사용하기.
+
+select this style하면 링크 뜸 ->헤드에 가져가기
+
+CSS rules to specify families 이거 찾아서 (사이트)
+font-family: 'Pacifico', cursive; 이거 복사해서 헤더에 적용하기
+
+Footer에도 똑같이 적용
+
+
+깃 커밋 업로드까지
