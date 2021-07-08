@@ -1,0 +1,77 @@
+스태틱 디렉토리 만들기 (최상위 폴더에)
+스태틱안에 css 파일 'base'로 만듬
+
+header div의 스타일 삭제하기 copy
+
+css파일에 class 생성
+
+후 header div에 class = '클래스이름' 
+
+
+django static 구글에 검색 가장 상단 페이지 들어감
+
+https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+
+setting.py파일로 들어가서
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+작성하기
+
+#control b누르면 소스코드로 다 들어가짐.
+
+head 파일로 들어와서
+맨 앞에
+{% load static %} (장고구문임{%)
+    
+
+맨 아래 {# DEFAULT CSS LINK #}
+    <link rel="stylesheet" type="text/css" href="{% static 'base.css' %}">
+
+이것도 적어주기
+
+전체적으로 header랑 footer전부css class화 시키기
+
+
+------------------------------------------------------------
+alt shift -=>많이 생성가능
+1.
+templates -> accountapp -> hello_world.html파일 들어가서
+div 4개 생성 및 스타일 생성
+
+    <div class="testing" style="display: block">block</div>
+    <div class="testing" style="display: inline">inline</div>
+    <div class="testing" style="display: none">none</div>
+    <div class="testing" style="display: inline-block">inline-block</div>
+    <div class="testing"></div>
+
+
+
+2.
+{%다음에
+    <style>
+        .testing{
+            background-color: yellow;
+            margin: 1rem;
+            height: 48px;
+            width: 48px;
+            border-radius: .5rem;
+        }
+    </style>
+이거 작성
+
+##############상자 밖으로 나가게 되면 div 의 높이를 키우셈!
+3.깃 업로드
+
+### 30rem으로 바꿧던 부분 overflow: scroll
+
+이거 써주면 스크롤 바 생김
+
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+display:inline - block;
+을 style 태그에 적어주셈
+
+div4개를 px rem em %로 이것저것 바꿔볼 것임
