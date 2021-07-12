@@ -1,0 +1,144 @@
+7.9
+
+사이트에서 검사 후
+가장 상위 element.style에
+폰트사이즈 기입하고 바꾸면
+박스 크기 커져있음.rem
+
+
+
+파일로돌아와서
+accountapp폴더에
+models.py파일로 들어감.
+
+class만들어주고 이름을 newmodel로 써줌(바꿔도됨)
+()괄호 안에 models 안에 model을 상속 받아 줄 거임(장고에서 제공하는 기본모델)
+
+class NewModel(models.Model):
+
+그 다음 속성을 넣어줄거임 = 텍스트
+
+모델스 안에 캐릭터필드를 통해서 문자열을 입력받는 속성을 하나 만들어줄 거임
+
+max_length 는 최대 문자열의 길이가 255
+null 은 이 데이터를 공간으로 나둘수 있냐 없냐의 선택권. 무조건 넣어야한다? False
+
+
+
+class NewModel(models.Model):
+    text = models.CharField(max_length=255, null=False)
+
+
+
+명령어를 사용하려면 왼쪽하단 '터미널'창에 쓰면됨.
+
+python manage.py makemigrations 쳐주자
+
+-create model newmodel이라고 뜰거임
+
+그리고 migrations 폴더에 0001 파일이 생겼을 거임(장고에서 제공해주는 기본 파일이고 장고가 알아서 해줄거임)=절대 지우면 안됌.
+
+
+그 다음 터미널에
+
+python manage.py migrate쳐주면 됨.
+ 뭐가 설치되듯이 쭉쭉 내려갈 거임
+
+
+commit - push해주기
+
+<의미>
+makemigrations = model 변경을 감지하고 변경사항을 반영할 파일을 생성
+
+장고 모델에다가 뭘 적으면, 같은 내용의 새로운 파이썬 파일을 만들고 변화를 추적하는 거임.
+
+migration의 정의
+변화를 반영하는 방법 - 당신의 데이터베이스 스키마에다가
+
+하지만 makemigrations만 하면, 파일만 생성됨
+
+migrate를 하게되면 db에 반영하게 됨, 실제로!
+
+모든 변경사항을 makemigration에서 추적하고
+migrate로 파일 생성
+
+=>모델 사용 준비가 완료됨 db완료
+
+
+=============================
+
+tem = account 폴더 - hello파일에서
+
+내용들 거즌 지워줌ㅜㅠ
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div style='margin: 2rem; text-align: center'>
+
+        <h1> HTTP METHOD </h1>
+    
+    <h3>{{ text }}</h3>
+
+    </div>
+
+{%  endblock %}
+
+이렇게만 남김
+
+
+view파일 들어가서 아래 형식처럼 바꿔줌
+def hello_world(request):
+    if request.method == "POST":
+        return render(request, 'accountapp/hello_world.html',
+                      context={'text' : 'POST METHOD!'})
+
+    else:
+        return render(request, 'accountapp/hello_world.html',
+                      context={'text' : 'GET METHOD!'})
+
+
+render에서 컨트롤 d누르고
+
+shortcuts.py폴더로 들어가게 됨.
+
+commit - push해주기
+
+
+
+hello python 페이지에서
+        <h3>{{ text }}</h3>
+이거 삽입해주면 get method! 가 뜹니다. 근데, text 대문자 안됌 소문자로 구별해줘야함.
+
+
+post는 게시글 작성 수정 등등, 그런거 할 때 씀. 그리고 올리는 버튼 같은게 있어야함. 그 트리거를 만들어 줄 것임
+
+
+hello world페이지에
+
+        <form action="/accounts/hello_world/" method="post">
+            {% csrf_token %}
+            <input type="submit">
+
+        </form>
+
+/이거 잘 써야하고, 주소도 각 파일에 맞게 바꿔 쓸 줄 알아야함.
+
+
+form에는 꼭 csrf구문을 작성해주어야함
+
+input에 부트스트랩 들어가서
+
+ <input type="submit"
++
+class="btn btn-outline-dark
+이거 받아오고
+
+rounded-pill
+
+부드럽게 돌려주고
+
+px-5
+공간폭 보기 좋게해줌(부트스트랩에서 제공하는 사이즈 0,1,2,3,4,5)
+
