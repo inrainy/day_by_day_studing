@@ -1,0 +1,252 @@
+7.16.web.app.tutor
+
+
+header.html파일로 들어가서
+<span>3</span>
+사이에 3을 지우고
+<a href="{% url 'accountapp:login' %}"></a>
+                Login
+얠적어 넣어줄것임.
+<span>4</span>
+사이에 4을 지우고
+<a href="{% url 'accountapp:create' %}"></a>
+                SignUp
+얠 적어 넣어줄것임.
+
+<span>2랑
+<span>3 사이에
+        {% if not user.is_authenticated %}
+이거 넣어주면 됨.
+
+<span5번 만들어줄 것임>
+{% else %}꼭 써주고!
+<span>
+            <a href="{% url 'accountapp:logout' %}">
+                Logout
+            </a>
+
+        </span>
+{% endif %} 까지 적어주기!
+
+commit-push
+=====================================
+
+구글에
+django bootstrap 4
+
+이거 적고 welcome이라는 첫번째 페이지 들어가기.
+
+intallation들어가서
+
+pip install django-bootstrap4
+복사하기
+
+터미널로 들어와서 해당 명령어 실행시키기
+
+
+그리고
+settings.py파일로 넘어와서
+
+InSTALLED_APPS스 안에
+    'bootstrap4',
+    'accountapp'
+]
+
+이렇게 넣어줌
+
+
+사이트에 quick start있음 이거 누르고
+{% load bootstrap4 %}
+복사하기
+
+creare.html폴더 들어가서
+최상단에
+{%extends => 이 아래
+{% load bootstrap4 %} 이거 적어주기
+
+
+
+사이트에
+
+{% bootstrap_form form %}
+이거 또 복사해서
+
+{{form}}부분을
+방금 복사한 것으로 바꿔줌
+
+
+-이 라이브러리 하나로, 회원가입 페이지나, 이런것들이 좀 깔끔해짐, 조금 ㅎㅎ;;;
+
+-이제 너비 조절할 것임.
+
+
+base.css파일 들어오기.
+
+
+.mw 최대 너비라는 뜻.
+
+.mw-500 {
+    max-width: 500px;
+    padding: 1rem 1.5rem;
+}
+이러한 클래스를 만들어줌.,
+
+create.html파일로 가서
+
+<div class="text-center">의 부분에 클러스 적용을 해줄것임.
+<div class="text-center mw-500">
+
+
+변동이 없을 건데
+
+사이트에 들어가서, f12누르고 검사하면
+상단에 network있음
+누르고 disable cache에 체크 하면. 변화가 생길 것임.
+
+-이검사창 켜놓고 적용해야 적용됨. 끄면 적용안됨.
+
+
+create.html파일로 가서
+<div class="text-center mw-500 m-auto">
+m-auto 이거 중앙정렬(지금 계속 부트스트랩기능들임....)
+
+
+
+login.html파일로 갈거임
+최상단에
+{%extends => 이 아래
+{% load bootstrap4 %} 이거 적어주기
+그 다음에
+{{form}}부분을
+{% bootstrap_form form %}이걸로 바꿔줌.
+
+<div class="text-center mw-500 m-auto">똑같이 적용해줌,
+
+
+commit-push
+
+=====================================
+
+나눔스퀘어 구글검색
+opt파일로 다운
+
+
+static폴더에
+fonts폴더 하나 만들어주고
+다운로드 받은 나눔 스퀘어 드래그 해서 넣어주면,
+끝. 파일에 ? 떠있을 것임
+
+
+head.html파일 들어가서
+
+<마지막 link>
+<마지막/head>
+
+사이에
+
+<style>
+        @font-face {
+            font-family: 'NanumSquareR';
+            src: local('NanumSquareR'),
+            url("{% static 'fonts/NanumSquareR.otf' %}") format("opentype");
+        }
+        @font-face {
+            font-family: 'NanumSquareEB';
+            src: local('NanumSquareEB'),
+            url("{% static 'fonts/NanumSquareEB.otf' %}") format("opentype");
+        }
+        @font-face {
+            font-family: 'NanumSquareB';
+            src: local('NanumSquareB'),
+            url("{% static 'fonts/NanumSquareB.otf' %}") format("opentype");
+        }
+        @font-face {
+            font-family: 'NanumSquareL';
+            src: local('NanumSquareL'),
+            url("{% static 'fonts/NanumSquareL.otf' %}") format("opentype");
+        }
+    </style>
+
+이거 넣어주기
+
+base.html 들어가기 (css랑 구분 잘하기!)
+
+첫번째 <body>태그에
+
+<body style="font-family: 'NanumSquareR">
+
+나눔 R 써주기
+
+폰트 바뀜!
+
+
+commit - push
+
+
+==================================
+
+view.py파일로 들어와서
+
+class AccountDetailView(DetailView):
+()괄호는 장고에서 가져오기! alt+enter
+
+    model = User
+    context_object_name = 'target_user'
+
+타겟 유저라는 이름을 붙임!
+3번째로 지정해줄 것
+
+    template_name = 'accountapp/detail.html'
+
+까지 작성해주기.
+
+
+롸우팅 할 때는? urls.py파일로!
+
+이제 path 지정하는 방법 알겠지?
+
+path('detail/', AccountDetailView.as_view(), name='detail')
+
+그리고 import 해주기! art+ enter
+
+
+path('detail/<int:pk>', AccountDetailView.as_view(), name='detail')
+
+추가로<int:pk>이거 넣어줌
+
+숫자로 프라이머리키를 받겠다는 것임.
+프라이머리 키:어떠한 행과도 차별되는 그 행의 고유값
+예를들어 : 게시글 고유 번호
+
+어카운트에 고유값을 주어서 페이지를 넘겨줄 예정이라고 함.
+
+
+
+detail.html 파일 만들어 주기!
+위치는 어디일지 알지? templates 폴더의 어카운트 앱 폴더
+
+안에 있는 내용 싹다 지우고
+create.html 내용 그대로 복사 붙여넣기
+
+안에 내용들을 변경해 줄것임,
+
+{% extends 'base.html' %}
+
+{%  block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>{{ target_user.username }}</h4>
+        </div>
+        <div>
+            {{ target_user.date_joined }}
+        </div>
+    </div>
+
+{%  endblock %}
+
+이렇게!
+
+
+여기까지! commit-push
