@@ -1,0 +1,185 @@
+7.20.web.app.tutor
+
+디테일뷰 설명시작
+
+
+header.html 파일로 들어감.
+
+<span>
+            <a href="{% url 'accountapp:detail' pk=user.pk %}">
+                MyPage
+            </a>
+        </span>
+
+create랑 logout사이 else아래에 적어줌.
+
+지난시간 것과 합해서 commit-push해주면됨.(난이미함;;)
+
+
+views.py로 넘어와서 로직을 만들어 줄 것임
+
+class AccountUpdateView(UpdateView):
+    model = User 적어줄때 ()괄 호 안, import해주기
+
+
+전체적으로
+class AccountUpdateView(UpdateView):
+    model = User
+    form_class = UserCreationForm
+    context_object_name = 'target_user'
+    success_url = reverse_lazy('accountapp:hello_world')
+    template_name = 'accountapp/update.html'
+
+이거 작성해주면 됨.
+
+
+urls.py로 넘어와서
+
+path('update/<int:pk>', AccountUpdateView.as_view(), name='update')
+
+이거 아시겟죵? 이제 알아서 만들 수 잇는 듯,,,,
+
+
+templates / accountapp / create있는 폴더 안에
+update.html새로만들기
+
+create파일내용 긁어와서 복사 붙여넣기
+<h4>Update Info</h4>
+<Form action="{% url 'accountapp:update' pk=target_user.pk %}" method="post">
+
+2개 변경해서 적어주기
+
+
+detail.html로 넘어와서
+
+<div>
+            <a href="{% url 'accountapp:update' pk=target_user.pk %}">
+Update Info
+            </a>
+        </div>
+
+이거 작성해줌.
+
+
+
+commit-push
+
+
+====================================
+
+
+views.py파일로 와서
+
+class AccountDeleteView(DeleteView):
+    model = User
+    context_object_name = 'target_user'
+    success_url = reverse_lazy('accountapp:hello_world')
+    template_name = 'accountapp/delete.html'
+
+작성 여기서 () 는 import해주기
+
+urls.py파일로 와서
+
+    path('delete/<int:pk>', AccountDeleteView.as_view(), name='delete')
+
+accountdeleteview는 import해주기
+
+
+templates / accountapp / create있는 폴더 안에
+delete.html새로만들기
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Quit</h4>
+        </div>
+
+        <div>
+            <Form action="{% url 'accountapp:delete' pk=target_user.pk %}" method="post">
+                {% csrf_token %}
+                
+                <div class="m-5">
+                <input type="submit"
+                       class="btn btn-danger rounded-pill px-5">
+                </div>
+
+            </Form>
+        </div>
+    </div>
+    
+
+{%  endblock %}
+
+이 내용 넣어주기
+detail.html로 들어와서
+
+<div>
+            <a href="{% url 'accountapp:delete' pk=target_user.pk %}">
+                Quit
+            </a>
+        </div>
+
+update가 있는 div아래에 이 내용 적어주기
+
+
+commit-push
+
+오늘 update랑 delete html만들었는데 form 삭제는 delete만 진행함
+
+
+------------------------------------------------
+
+detail.html파일로 들어가서
+
+로그아웃을 해도 주소창에 검색하면 해당 페이지가 들어가지는데 검색해도 못들어가게 하려고
+
+{% if user == target_user %}
+
+를 update<div>위에 적어주고
+
+delete<div> 아래에
+
+{% endif %}
+
+이거 적어서 보안처리.
+
+
+-----------------------------------------------
+
+현재 아이디까지 바꿀 수 있음.
+아이디를 임의로 유저가 변경할 수 없도록 해줄 것임.
+
+views.py들어가면
+
+class updateview쪽에서
+updatecreateform이 닉네임을 바꿀 수 있는 형식을 제공하고 있음,
+
+accountapp 가장큰 폴더 안에, forms.py파일을 만들어 줌.
+-형식을 지정하는 폴더로 사용할 것임.
+
+
+class AccountCreationForm(UserCreationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['username'].disabled = True
+
+이거 적어줄때 usercreationform 이 ()부분 import해주기
+
+(from django.contrib.auth.forms import UserCreationForm)이게 자동 생성 되도록
+
+그 다음 views.py안에 class updateview부분을
+
+form_class = AccountCreationForm
+
+바꿔주고 임포트 해주기.
+
+
+commit-push
+
+
+=============================
