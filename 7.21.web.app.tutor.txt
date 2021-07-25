@@ -1,0 +1,158 @@
+7.21 web.app.tutor
+
+views.py파일부터 시작.
+
+def hello_world(request):
+아래부분 전부다 들여쓰기 해주고
+
+if구문 하나 작성할 것임.
+if request.user.is_authenticated:
+
+아래쪽 닫는 구문
+    else:
+        return HttpResponseRedirect(reverse('accountapp:login'))
+
+-사이트에 아무나 들어오지 못하도록, 로그인을 해야만 들어갈 수 있도록 설정해주는 작업임.
+-펑션베이스드뷰에서 만들어준건데, 이게 FBV인것같고,
+
+
+그리고
+def UpdateView:
+쪽 들어가서 작업하나 더 진행해 줄 예정.
+마지막쪽에
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return super().get(request, *args, **kwargs)
+        else:
+            return HttpResponseRedirect(reverse('accountapp:login'))
+
+이부분 적어주기.
+
+
+이부분을 싹다 복사해서.
+아래에다 붙여넣기 하고
+get을 post로 바꿔주기. 2개있음 ㅎㅎ
+
+
+
+
+get, post내용 2개다 복사해서 delete밑에도 똑같이 적어주기
+
+commit-push
+
+delete, update뷰는 이제 로그인 없이는 링크 타고 못들어가~,~ 하지만 프로필 창은 들어갈 수 있나바. =디테일뷰
+
+
+
+
+
+
+
+로그인 여부만 확인한 작업임.
+
+현재 로그인 한 상태에서는 다른 계정의 업데이트나 탈퇴가 가능함.
+
+views.py파일에서
+방금 작성했던 def get부분을 수정해줄 것임.
+
+get_object()를 사용하면 타겟 유저를 가져올 수 있는 매소드임.
+
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated and self.get_object() == request.user:
+            return super().get(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
+
+이렇게 바꿔주면 되고
+
+마지막 포비든은 장고에서 가져와야함 import = alt+enter
+
+방금 작성했던 구문들 다시 변경 다 같이 해주고,
+
+detail 뷰 말고 ,update와 delete뷰에서는 접속 불가로 변경될것임.
+
+
+commit and push
+
+
+
+방금 진행한 함수들은 너무 지저분함!
+
+깔끔하게 해주기 위해서 사용할 decorator
+
+파이썬에서 제공해주는 기능 decorator
+
+데코레이터도 함수인데, 함수를 인자로 받음
+
+def decorator(func):
+새로운 함수를 선언하는 것.
+
+함수 앞 뒤를 꾸며주고잇댜.+
+
+
+
+======================================
+최상위폴더에dacorator.py만들건데
+
+사실 새파일 켜서 만들어도될정도로 중요한 것 아무것도 없음,
+
+프로젝트에 들어가는 내용아니고
+
+실습해본 것임.
+
+
+
+def decorator(func):
+    def decorated(input_text):
+        print('함수 시작!')
+        func(input_text)
+        print('함수 끝!')
+
+    return decorated
+
+
+@decorator
+def hello_world(input_text):
+    print(input_text)
+
+
+hello_world('Hello World!')
+
+
+이거 적어주고 실행시켜봐야하는데, 그걸 못하고있음 현재
+
+
+다음 실습 ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+삼각형의 넓이 계산 함수 작성
+
+사각형의 넓이 계산 함수 작성
+
+입력값이 모두 양수인지 확인하고, 아닐경우error발생 데코레이터 작성 및 적용.
+
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+
+다시 views.py로 돌아옴!
+
+아까 만들어 줬던.hello_world 부분(request):
+
+여기를 이전 상태로 복원해줄거임. if 랑 else 빼고, 들여쓰기 취소하고 cauz 데코레이트 사용할거거든
+
+
+def hello_world(request):
+
+이거 위에
+@login_required
+이거 적어줄거임!, 그리고import해줌!
+
+
+@method_decorator(login_required, 'get')
+@method_decorator(login_required, 'post')
+
+아래것들도 다 지워주고
+
+장고에서 지원하는 decorator다 넣어줄거임.
