@@ -1,0 +1,232 @@
+7.23.web.app.tutor
+
+
+
+accountapp 가장 상위폴더에 decorators.py파일 만들어준다.
+
+
+
+def account_ownership_required(func):
+    def decorated(request, *args, **kwargs):
+        target_user = User.objects.get(pk=kwargs['pk'])
+        if target_user == request.user:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
+    return decorated
+
+
+적어주기
+
+
+--
+User은 import해주기
+(상위 import값 :from django.contrib.auth.models import User)
+
+HttpResponseForbidden 도 import해주기
+(상위 import값 :from django.http import HttpResponseForbidden)
+--
+
+
+
+
+views.py파일로 와서
+
+@method_decorator(account_ownership_required, 'get')
+@method_decorator(account_ownership_required, 'post')
+
+@method들 아래 적어줌.
+account_ownership꼭 import해주기
+
+
+
+근데 4줄인것도 마음에 안듬.
+매소드 데코레이터가 단일 데이터만 받는게 아니라
+리스트도 받아서, 리스트 안에 있는 데코레이터 전부 받음.
+
+리스트 만들어줄거임.
+has_ownership = [login_required, account_ownership_required]
+
+
+
+최종적으로
+
+@method_decorator(has_ownership, 'get')
+@method_decorator(has_ownership, 'post')
+
+이렇게 만들어지면 됨,
+
+
+git commit-push
+
+------------------------------------------------------------
+
+
+다음으로 만들 내용 프로필앱
+
+
+프로필에서 보여줄 것,
+프로필 이미지, 프로필 닉네임(아이디 대체), 대화명 메세지
+
+
+
+
+web_app_study폴더에 있는 urls.py들어간다!
+거기에 admin페이지 관련된 내용있음.
+사이트에
+http://127.0.0.1:8000/admin/ 만치면 관리자 페이지가 뜸!
+
+
+
+터미널에
+python manage.py createsuperuser
+관리자 아이디 만드는 거임.
+
+아이디 admin
+비밀번호 girl8990으로 진행함.
+
+sql db user들어가면 수퍼유저 계정으로 생성되어있음.
+--
+
+이미지를 만들어줄거기 때문에
+이미지 관리자 페이지를 만들어 줄 것임
+
+settings.py
+
+폴더로 들어가자
+
+STATIC_URL = '/static/'
+이거 아래
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+이거 적어주기. (이전에 놓치고 간 부분)
+os는 운영체제
+path 경로관련 
+join 베이스랑 스태틱파일을 합쳐서 os사이의 완전한 경로를 연결하는 것
+스태틱 루트라는 경로로 저장을 하겠다는 것.
+staticfiles
+
+
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+이거 추가 작성.
+
+/media/관련된 모든 내용을 media_url이 받나봄
+
+
+commit_push
+
+
+=====================================
+
+1:1 프로필과 어카운트
+한 어카운트에 단일 프로필만 나오도록 연결을 해줄거임.
+
+
+
+모든 창 끄고
+
+terminal에서
+
+python manage.py startapp profileapp
+
+적어줄것임,
+
+이때 새로운 앱폴더가 생김.
+
+
+settings.py에 installed_app부분에
+profileapp',을 추가할 것임.
+
+그리고 같이 있는 폴더에
+urls.py를 들어가서
+
+path('profiles/', include('profileapp.urls'))
+
+추가로 urlpatterns리스트 안에 적어줄것임.
+
+
+profileapp폴더에, urls 파일을 만들어 줄 것임,
+
+일단 적을 내용이 없으니
+
+urlpatterns = [
+
+]
+
+이렇게 빈리스 적어주고 넘어감. (안적으면 makemigrations가 안됨 ㅠㅠ)
+
+profileapp의 models.py파일을 들어갈 것임
+
+
+
+
+일단 commit_push진행하자
+
+
+---------------
+
+profileapp의 models.py파일을 들어갈 것임
+
+
+유저객체가 삭제되었을 때 어떤식으로 반응할거냐?
+어카운트도 사라지게! 1:1 매칭이니까,
+
+related_name이라는 것은
+프로필을 어떻게 접근 할 것인지,
+
+이미지 경로를 어떻게 설치 할 건지
+
+null=true로 설정한 다는 것은
+없어도 괜찮다는 뜻!
+
+
+다 해서
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE,
+                                related_name='profile')
+
+    image = models.ImageField(upload_to='profile/', null=True)
+    nickname = models.CharField(max_length=30, unique=True, null=True)
+    message = models.CharField(max_length=200, null=True)
+
+이렇게 작성하면 됨! 여기서 user는 꼭 import해주자!
+
+
+
+모델 작성이 끝나면 마이그레이션 작업을 해줬음
+db에 있어야 사용 가능 했으니까
+
+터미널로 가서,
+
+먼저 pip install pillow를 설치해주겟움!
+
+그다음 터미널에
+
+python manage.py makemigrations
+
+
+이거 작성해서
+
+Create model Profile
+
+이구문 보면 완성 된 것임!
+
+그리고
+
+python manage.py migrate
+
+적어주고
+
+db확인하고
+
+commit - push해주면 끝.
+
+
+---------------------------------
+
+
