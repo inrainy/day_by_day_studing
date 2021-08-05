@@ -1,0 +1,148 @@
+7.27 web.app.tutor
+
+profileapp 폴더에
+
+forms.py파일 생성
+-
+from profileapp.models import Profile
+
+
+class ProfileCreationForm(ModelForm):
+    class Meta:
+        model = Profile
+        fields = ['image', 'nickname', 'message']
+-
+이거 작성해주고
+(ModelForm):을 import해주기
+
+commit-push
+
+---------------------------------
+
+profileapp / view.py로 들어감.
+ㅡ
+class ProfileCreateView(CreateView):
+    model = Profile
+    form_class = ProfileCreationForm
+    success_url = reverse_lazy('accountapp:hello_world')
+    template_name = 'profileapp/create.html'
+ㅡ
+적어주고, 
+
+(CreateView):, Profile, ProfileCreationForm, reverse_lazy
+import해주기
+
+
+
+profileapp / urls.py로 들어감
+-
+
+app_name = 'profileapp'
+
+urlpatterns = [
+    path('create/', ProfileCreateView.as_view(), name='create'),
+]
+-
+
+작성해주면 되는데, 이 때
+path는 꼭
+from django.urls import path
+이걸로 import해줘야 함
+ProfileCreateView.as_view
+도 import해줘야함.
+
+
+
+profileapp에 새로운 templates 폴더를 만들어 줄 것임 그리고 폴더 안에 또
+profileapp이라는 폴더를 만들어 주고
+이 안에 create.html 파일을 만들어 줄거임
+
+
+accountapp의 templates 폴더의 profileapp폴더의 create.html 파일 내용들을 싹 다 복사 붙여넣기 할 것임.
+
+<h4>Create Profile</h4>
+<Form action="{% url 'profileapp:create' %}" method="post">
+
+이렇게 두 부분만 바꿔주면 됨.
+
+
+
+
+
+실행해보기
+
+http://127.0.0.1:8000/profiles/create/
+
+링크 작성하면 들어가짐.
+
+commit-push
+
+=============================
+
+profileapp/templates/profileapp/create.html 
+이 파일에서
+
+<Form action="{% url 'profileapp:create' %}"
+                  enctype="multipart/form-data"
+                  method="post">
+
+이렇게 바꿔줌.
+
+multipart/form-data - 모든 문자를 인코딩 하지 않음을 명시함.
+이 방식은 <form>요소가 파일이나 이미지를 서버로 전송할 때 주로 사용함.
+
+-파일이 전송되지 않는 문제를 해결하기 위해 진행한 작업임
+
+
+
+-
+
+profileapp/views.py로 파일을 들어감
+
+def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+이걸 class안에 입력해줌.\
+이유 : form_valid 라는게, 이미지가 있는지 없는지 확인하는 검증과정 이 있었는데, 여튼 부모의 form밸리드를 받았다라는 걸 이해하고 가라는데,,,
+
+사이에 적은 문장이 커스터마이징 과정을 적는 거라고 함.
+리퀘스트를 보내는 유저를 의미함.
+폼 안에 클라이언트로부터 받은 이미지,닉네임,메세지 값이 있을거고 이게 저장이 되면 완성될 인스턴스 =프로파일 객체 겠고, 그것의 유저를 리퀘스트 유저로 설정해준다는 말임.
+유저를 식별하는 과정이라고함.
+
+
+-로그인 후 진행해야 db에서도 확인가능
+
+
+commit-push
+========================
+
+
+accountapp/templates/accountapp/detail.html
+파일로 들어감.
+
+profile앱을 만들긴 했지만 실제로는 이 파일을 꾸며주기 위함임.
+
+이 유저가 profile이 있는지 없는지부터 구분하는 구문을 써 줄것임.
+{% if target_user.profile %}
+
+
+정리해서
+
+{% if target_user.profile %}
+                <h4>{{ target_user.profile.nickname }}</h4>
+                <h5>{{ target_user.profile.message }}</h5>
+            {% else %}
+            <h4>
+                <a href="{% url 'profileapp:create' %}">
+                    Create Profile
+                </a>
+            </h4>
+            {% endif %}
+이렇게 작성해주면 됨.,
+
+git-commit and push
+
+하면 
+끝임
