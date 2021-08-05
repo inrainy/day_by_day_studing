@@ -1,0 +1,245 @@
+7.28 web.app.tutor
+
+accountapp/templates/accountapp/detail.html
+파일에서
+-
+            {% if target_user.profile %}
+                 <img src="{{ target_user.profile.image.url }}"
+                     class="profile_image m-4"
+                     alt="profile image">
+                <h4>{{ target_user.profile.nickname }}</h4>
+-
+이렇게 변경해주기. 추가 된 것이 있을 것임. 확인해보기.
+m-4 마진을 상하좌우 4 주겠음.
+
+
+
+
+web_app_study_6_30/urls.py
+파일에서
+-
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('accountapp.urls')),
+    path('profiles/', include('profileapp.urls'))
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+-
+
++ static() 이부분을 from django.conf.urls.static import static이걸로 import 해오기
+settings 이부분을 from django.conf import settings 이걸로 import 해오기
+
+
+
+static/base.css 스태틱 폴더 안에 있는 bass.css들어가기
+-
+.profile_image {
+    height: 12rem;
+    width: 12rem;
+    border-radius: 20rem;
+    object-fit: cover;
+}
+
+.NNS_B {
+    font-family: "NanumSquareB", cursive;
+}
+
+-
+
+border-radius둥글둥글 만들어 주겠다는 거야아
+height,width 를 12rem 1:1로 만들어줘버려서,
+이 안에 짜부하려고 사진이, 가로세로 사이즈 감당 안하고 줄여짐.
+가로로 긴사진이면 아주 얇아지겟쥬?
+
+object-fit: cover; 그 때 이 걸 사용하면 1:1로 잘라지며 왜곡이 없는 사진으로 바뀜
+
+
+
+
+accountapp/templates/accountapp/detail.html
+파일에서
+-
+<h2 class="NNS_B">
+                    {{ target_user.profile.nickname }}
+                </h2>
+
+h4를 h2 로 바꿔 줄 것임.
+-
+
+commit-push
+
+------------------------------------------------------
+
+profileapp/views.py
+로 들어가서
+ㅡ
+class ProfileUpdateView(UpdateView):
+    model = Profile
+    context_object_name = 'target_profile'
+    form_class = ProfileCreationForm
+    success_url = reverse_lazy('accountapp:hello_world')
+    template_name = 'profileapp/update.html'
+ㅡ
+이거 적어주고
+(UpdateView):를 import해주기 보편적으로 올라갈 것
+('accountapp:hello_world')
+이부분 서브 프로젝트에서는 잘 체크하자~~
+
+
+profileapp/urls.py
+로 들어가서
+ㅡ
+path('update/<int:pk>', ProfileUpdateView.as_view(), name='update'),
+ㅡ
+이거 적어줄 것임.
+여기서ProfileUpdateView 이거 임폴트 꼭 해줘라!
+
+
+
+profileapp/templates/profileapp으로 들어가서
+
+update.html파일 만들어 줄 것임.
+
+ㅡ
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Update Profile</h4>
+        </div>
+        <div>
+            <form action="{% url 'profileapp:update' pk=target_profile.pk %}"
+                  enctype="multipart/form-data"
+                  method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-dark rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+
+이거 적어주면 됨.
+
+
+
+accountapp/templates/accountapp/detail.html
+
+그리고 이 파일 들어가서
+-
+<h2 class="NNS_B">
+                    {{ target_user.profile.nickname }}
+                    <a href="{% url 'profileapp:update' pk=target_user.profile.pk%}">
+                        edit
+                    </a>
+                </h2>
+-
+h2클래스 안에 href만들어 주면됨,
+pk다음 target_profile절대 아니고 target_user.profile.pk 이거임
+잘기억해야 하는 부분임!
+
+
+commit-push
+
+-------------------------------------------------------
+
+
+
+accountapp/templates/accountapp/detail.html 
+파일에서
+
+-
+{% if target_user == user %}
+                            <a href="{% url 'profileapp:update' pk=target_user.profile.pk%}">
+                                edit
+                            </a>
+                        {% endif %}
+-
+
+너 주인 아니면 에디트 못함 ^^ 만들어준거임!
+
+
+
+
+profileapp/views.py
+
+
+
+
+파일에서
+class ProfileCreateView(CreateView):
+이 클래스 위에
+@method_decorator(login_required, 'get')
+@method_decorator(login_required, 'post')
+
+이거 두개 적어주고
+
+import해주는데
+
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
+이게 임폴트가 되어야 함.
+
+
+
+
+class ProfileUpdateView(UpdateView):
+이 클래스 위에도
+
+@method_decorator(profile_ownership_required, 'get')
+@method_decorator(profile_ownership_required, 'post')
+
+이거 두 개 적어주는데
+(profile_ownership_required 이게 없음^^;
+
+
+profileapp상위폴더에
+decorators.py파일 만들어주고
+
+def profile_ownership_required(func):
+    def decorated(request, *args, **kwargs):
+        target_profile = Profile.objects.get(pk=kwargs['pk'])
+        if target_profile.user == request.user:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
+    return decorated
+
+이거 적어줌
+
+Profile
+이거 import
+from profileapp.models import Profile
+이렇게
+
+HttpResponseForbidden
+이것도 import
+from django.http import HttpResponseForbidden
+
+이것도 가져와주고
+
+=결론 감싸진 함수를 만들어놧고
+
+(profile_ownership_required 이거 적용 가능해짐.
+
+from profileapp.decorators import profile_ownership_required
+import하면 이거 가능 ^^
+
+
+=시현 / 로그인을 하고, 마이페이지에 들어가서, edit하면
+들어가지는 페이지의 위치가 대충
+http://127.0.0.1:8000/profiles/update/1이렇게 되는데 복사 하고
+로그 아웃 한 후 링크를 그대로 붙여넣기 하면
+127.0.0.1에 대한 액세스가 거부됨을 확 인 할 수 있음.
+
+commit-push
+
