@@ -1,0 +1,197 @@
+8.3.web.app.tutor
+
+articleapp/templates/articleapp/list.html 파일에서 시작//
+
+https://picsum.photos/ 이 페이지의
+https://picsum.photos/200/300 이러한 내용을 이용해서
+
+
+<div class="item1">1</div>
+여기의 내용을
+<div class="item1">
+          <img src="https://picsum.photos/200/300" alt="">
+      </div>
+
+이렇게 바꿔줌
+
+이 때 그림이 이상하게 채워짐, 그림 사이즈 맘대로
+ㅡ
+    <style>
+        .container div {
+          width: 280px;
+
+          background-color: antiquewhite;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border-radius: 1rem;
+        }
+
+        .container img {
+            width: 100%;
+            border-radius: 1rem;
+        }
+    </style>
+ㅡ
+
+스타일 태그를 바꿔주면, 그림이 fit하게 맞음
+중요한건height 관련 내용들을 없애야 사진사이즈가 레이아웃과 맞춰짐.
+
+
+높이와 넓이가 같으면 같은 요청의 그림이 송출되서 높이만 바꿔주면 다른 사진으로 바뀜.
+      <div class="item12">
+          <img src="https://picsum.photos/200/612" alt="">
+      </div>
+      <div class="item13">
+          <img src="https://picsum.photos/200/111" alt="">
+      </div>
+이러한 방식으로 높이를 바꿔줌,
+
+
+
+사진이 잠시 겹쳐있다가 레이아웃이 재배치 될 것임.
+
+commit-push
+
+
+----------------------------------------------------------
+
+
+static/js/magicgrid.js 여기로 들어와서
+ㅡ
+var masonrys = document.getElementsByTagName("img")
+
+for (let i=0; masonrys.length; i++) {
+  masonrys[i].addEventListener('load', function () {
+    magicGrid.positionItems();
+  }, false)
+}
+ㅡ
+
+이거 적어주면 되는데,
+
+이미지 태그를 모조리 찾고, 이미지가 생성될때마다 이미지를 재배치 해주겠다라는 뜻이고, 자바스크립트 for문임.
+i를 기준으로 for문을 돌리고 있음. addeventlistener이벤트가 일어나는 것을 감시하고 잇음. 확인은 load, 이미지가 로드 되었을 때
+positionitems 라는 매서드가 중요한데
+options False 는 탑다운 방식으로할지 바텀업 방식으로 할지를 골라주는 False true 라 이해하고잇으면 된다네.
+
+
+
+이미지 하나하나 로드 될 때마다 레이아웃이 재배치가 될 것임.
+
+그니까, 이제 겹치지 않는 것.
+
+commit-push
+
+
+---------------------------------------------
+
+
+articleapp/models.py 파일로 와서
+
+ㅡ
+class Article(models.Model):
+    writer = models.ForeignKey(User, on_delete=models.SET_NULL,
+                               related_name='article', null=True)
+
+    title = models.CharField(max_length=200, null=True)
+    image = models.ImageField(upload_to='article/', null=True)
+    content = models.TextField(null=True)
+
+    created_at = models.DateField(auto_now_add=True, null=True)
+ㅡ
+
+User를 import하기
+cascade는 종속이라는 의미였고, set_null은 탈퇴를 해도 작성자 미상의 글로 남도록 하는 의미
+null=true는 널이 될 수도 있다.
+
+그 아래로는 게시글이라면 당연한 내용들.
+charfield는 문자열을 받는 것 (제목:200자, null값 가능)
+created_at 언제 이 글을 작성했는지,
+
+
+다음 터미널로 와서, python manage.py makemigrations
+python manage.py migrate까지 해주기!
+
+
+
+
+articleapp/forms.py 파일을 만들어주면 됨.
+ㅡ
+class ArticleCreationForm(ModelForm):
+    class Meta:
+        model = Article
+        fields = ['title', 'image', 'content']
+ㅡ
+
+import정보
+from django.forms import ModelForm
+from articleapp.models import Article
+
+
+commit-push
+
+----------------------------------------------------
+
+
+articleapp/views.py 파일로 와서
+
+ㅡ
+class ArticleCreateView(CreateView):
+    model = Article
+    form_class = ArticleCreationForm
+    success_url = reverse_lazy('accountapp:hello_world')
+    template_name = 'articleapp/create.html'
+
+    def form_valid(self, form):
+        form.instance.writer = self.request.user
+        return super().form_valid(form)
+ㅡ
+
+여기서
+4가지 import너를 믿고 import하면 그게 맞음.^^;;
+
+
+
+articleapp/urls.py 파일로 와서
+
+ㅡ
+    path('create/', ArticleCreateView.as_view(), name='create'),
+ㅡ
+추가해주고
+
+ArticleCreateView를 import해주기
+
+
+articleapp/templates/articleapp/create.html 파일 만들어주기
+ㅡ
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Create Article</h4>
+        </div>
+        <div>
+            <form action="{% url 'articleapp:create' %}"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-dark rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+
+작성
+
+commit-push
