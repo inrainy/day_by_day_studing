@@ -1,0 +1,284 @@
+8.4.web.app.tutor
+
+articleapp/views.py 파일로 와서
+
+ㅡ
+class ArticleDetailView(DetailView):
+    model = Article
+    context_object_name = 'target_article'
+    template_name = 'articleapp/detail.html'
+ㅡ
+(DetailView): import해주기
+
+
+articleapp/urls.py 파일로 와서
+ㅡ
+path('detail/<int:pk>', ArticleDetailView.as_view(), name='detail'),
+ㅡ
+ArticleDetailView import해주기
+
+
+articleapp/templates/articleapp/detail.html 디테일 파일 만들어주고
+
+ㅡ
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+
+    <div class="container">
+        <div>
+            {#      게시글 제목, 글쓴이, 작성일자      #}
+            <h1>{{ target_article.title }}</h1>
+            <h4>{{ target_article.writer.profile.nickname }}</h4>
+            <p>{{ target_article.created_at }}</p>
+        </div>
+        <div>
+            {#      게시글 내용, 게시글 대표 이미지      #}
+            <img src="{{ target_article.image.url }}" alt="">
+            {{ target_article.content }}
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+
+articleapp/views.py이 파일에서
+CreateView 이 부분에
+success_url = reverse_lazy('accountapp:hello_world')
+이거 지우기
+
+
+그리고 
+def form_valid 아래에
+
+ㅡ
+    def get_success_url(self):
+        return reverse('articleapp:detail', kwargs={'pk':self.object.pk})
+ㅡ
+작성하기
+
+
+
+
+commit-push
+
+
+---------------------------------------------------------------
+
+
+articleapp/views.py이 파일에서
+
+ㅡ
+class ArticleUpdateView(UpdateView):
+    model = Article
+    form_class = ArticleCreationForm
+    context_object_name = 'target_article'
+    template_name = 'articleapp/update.html'
+
+    def get_success_url(self):
+        return reverse('articleapp:detail', kwargs={'pk': self.object.pk})
+ㅡ
+
+이거 적어주기. 알아서import하렴
+
+
+articleapp/urls.py이 파일로 가서
+ㅡ
+path('update/<int:pk>', ArticleUpdateView.as_view(), name='update'),
+ㅡ
+
+작성.알아서 import
+
+
+
+ articleapp/templates/articleapp/update.html이 파일 만들기
+
+ㅡ
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Update Article</h4>
+        </div>
+        <div>
+            <form action="{% url 'articleapp:update' pk=target_article.pk %}"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-dark rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+작성하면 끝.
+
+
+articleapp/templates/articleapp/detail.html 
+파일로 다시 들어가서
+{{ target_article.content }}
+이거랑
+마지막
+        </div>
+    </div>
+이거 사이에
+
+            <div>
+                <a href="{% url 'articleapp:update' pk=target_article.pk %}"
+                   class="btn btn-success rounded-pill px-5">
+                    Update
+                </a>
+            </div>
+
+이거 적어 넣어주기
+버튼이랑, update로 넘어가는 페이지 만들어주는거임.
+
+commit-push
+
+
+================================
+
+articleapp/views.py파일에서
+
+ㅡ
+class ArticleDeleteView(DeleteView):
+    model = Article
+    context_object_name = 'target_article'
+    success_url = reverse_lazy('articleapp:list')
+    template_name = 'articleapp/delete.html'
+ㅡ
+알아서 import
+
+
+articleapp/urls.py 파일에서
+
+ㅡ
+path('delete/<int:pk>', ArticleDeleteView.as_view(), name='delete'),
+ㅡ
+
+이게 라우팅을 하는 작업이라네?
+
+
+알아서 import
+
+
+articleapp/templates/articleapp/delete.html 파일 생성
+
+ㅡ
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Delete Article : {{ target_article.title }}</h4>
+        </div>
+        <div>
+            <form action="{% url 'articleapp:delete' pk=target_article.pk %}"
+                  method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-danger rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+
+
+articleapp/templates/articleapp/detail.html 로 들어가서
+
+<a>update</a> 버튼 만들어준 내용
+아래에
+ㅡ
+<a href="{% url 'articleapp:delete' pk=target_article.pk %}"
+                   class="btn btn-danger rounded-pill px-5">
+                    Delete
+                </a>
+ㅡ
+
+
+commit-push
+
+--------------------------------------------------------
+
+
+control+b누르면 들어가서 어딘지 볼 수 잇다 잊지말쟈.
+---------------------------------------------------------
+
+현재는 로그아웃을 해도 게시글이 수정이 되어버림.
+이것을 막아줄거임.
+
+
+articleapp/views.py 파일로 가서
+ㅡ
+@method_decorator(login_required, 'get')
+@method_decorator(login_required, 'post')
+ㅡ
+createview위에 이거 적어주기
+
+import는
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
+이거임.
+
+
+update랑 delete view위에
+ㅡ
+@method_decorator(article_ownership_required, 'get')
+@method_decorator(article_ownership_required, 'post')
+ㅡ
+
+이거 적어줄거임.,
+
+articleapp/decorators.py만들어 줄거임.
+
+
+ㅡ
+from django.http import HttpResponseForbidden
+
+from articleapp.models import Article
+
+
+def article_ownership_required(func):
+    def decorated(request, *args, **kwargs):
+        target_article = Article.objects.get(pk=kwargs['pk'])
+        if target_article.writer == request.user:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
+    return decorated
+ㅡ
+
+이렇게 적어줄 것임,
+
+
+import 잘해주고
+로그아웃 상태에서 update랑 delete버튼은 있지만 연결되지는 않을 것임HttpResponseForbidden됨.
+
+
+
+commit-push
+ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+
+강사님 비 로그인 상태에서 article/create로 들어가면,  로그인 하라는 창이 나오는데 로그인 후에 create 창이 아니라 accounts/hello_world/ 창으로 나오는 것 맞나요?
+
+이거 질문했고 나만 그런거 아님. 확인 후 말씀해주신다심.
