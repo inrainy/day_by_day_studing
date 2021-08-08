@@ -1,0 +1,285 @@
+8.6.web.app.tutor
+
+
+디테일 페이지가 디자인이 아무것도 안 되어 있음.
+
+articleapp/templates/articleapp/detail.html 페이지로 가서
+
+ㅡ
+    <div class="container text-center">
+        <div class="my-5">
+            {#      게시글 제목, 글쓴이, 작성일자      #}
+            <h1 class="NNS_B">{{ target_article.title }}</h1>
+            <h4>{{ target_article.writer.profile.nickname }}</h4>
+            <p>{{ target_article.created_at }}</p>
+        </div>
+
+        <hr>
+
+        <div class="my-5">
+            {#      게시글 내용, 게시글 대표 이미지      #}
+            <img src="{{ target_article.image.url }}"
+                 class="article_image"
+                 alt="">
+            <div class="article_content my-5">
+                {{ target_article.content }}
+            </div>
+ㅡ
+잘 찾아보셈. 이렇게 변경할 것임,
+
+
+
+
+
+static/base.css
+
+ㅡ
+.article_image {
+    width: 60%;
+    border-radius: 2rem;
+    box-shadow: 0 0 1rem grey;
+}
+
+.article_content {
+    text-align: left;
+    font-size: 1.1rem;
+}
+ㅡ
+
+추가로 적어주기,
+
+css적용이 안될때는 항상 f12 , disable, f5
+
+
+
+
+articleapp/templates/articleapp/detail.html 페이지에서 고치면서
+
+{{ target_article.content }}
+아래에
+ㅡ
+            </div>
+            {% if target_article.writer == user %}
+            <div>
+ㅡ
+
+이거 적어주고 사이에 알맞게 if구문
+
+ㅡ
+            {% endif %}
+ㅡ
+이걸 아래 디브태그 위에 적어주기
+        </div>
+    </div>
+
+
+이거 해주면 로그아웃 된 상태에서update, delete버튼이 사라짐.
+
+
+commit- push
+
+------------------------------------------------------------
+
+페이지 네이션 / 페이지를 나눠주는 것
+인피니트 스크롤 / 페이스북, 인스타그램 = 무한한 피드 = 노페이지
+
+
+
+articleapp/views.py 파일로 가서
+
+listview로직을 만듬.
+ㅡ
+class ArticleListView(ListView):
+    model = Article
+    context_object_name = 'article_list'
+    template_name = 'articleapp/list.html'
+    paginate_by = 20
+ㅡ
+
+추가 listView 장고에서 지원하는 view로 import
+
+paginate_by 한페이지에 20개 넣어줄거라서 =20이라 적음/수정예정
+
+
+
+
+articleapp/urls.py 파일로 가서
+
+
+path('list/', TemplateView.as_view(template_name='articleapp/list.html'), name='list'),
+이부분을
+
+ㅡ
+path('list/', ArticleListView.as_view(), name='list'),
+ㅡ
+
+이렇게 바꿔줌,
+추가로,ArticleListView import해주기
+
+
+
+
+
+articleapp/templates/articleapp/list.html 파일로 가서
+
+-
+background-color: antiquewhite; 삭제
+-
+
+ㅡ
+            flex-direction: column;
+            box-shadow: 0 0 1rem #c2c2c2;
+ㅡ
+같은 container div 태그 위치 마지막에 추가
+
+
+
+
+
+<div class="container my-4">
+이부분 아래에
+ㅡ
+        {% for article in article_list %}
+
+            <div>
+                <a href="{% url 'articleapp:detail' pk=article.pk %}">
+                    <img src="{{ article.image.url }}" alt="">
+                </a>
+                <span class="NNS_B my-2">{{ article.title }}</span>
+            </div>
+
+        {% endfor %}
+ㅡ
+이걸로
+마지막에
+-
+    </div>
+
+    <script src="{% static 'js/magicgrid.js' %}"></script>
+-
+이것만 남게 정리
+
+=이 구문의 내용
+리스트 뷰에서 컨텍 오브젝트네임 설정함.
+알티클에서 가지고 있는 알티클 객체들을 html에서 받아서
+알티클 리스트에 있는 알티클들을 뽑아낸거고
+그걸 태그에 해당내용을 출력해주는 것
+
+각각의 게시글 별로 이 html태그를 만들어 주겠다.
+
+ㅡ
+article list에 있는 article객체들을 for문을 통해 html에서 해당내용을 출력해주면서 각각의 게시글 별로 html태그를 만들어 주는 구문
+이라고 이해하고 있으면 맞을까요?
+ㅡ
+이렇게 이해하고 있으면 됨.
+
+
+
+
+bugfix!!!!!!!!!!!!!!!!!!
+magicgird.js파일에서,
+for (let i=0; masonrys.length; i++)이 부분을
+
+for (let i=0; i < masonrys.length; i++)이렇게 바꿔주기!
+
+
+
+commit-push
+
+=======================================
+
+
+articleapp/views.py파일에서
+ㅡ
+paginate_by = 1
+ㅡ
+
+1로 바꿔주기만 하면 됨!
+
+
+
+
+articleapp/templates/articleapp/list.html 파일로 가서
+
+
+    <script src="{% static 'js/magicgrid.js' %}"></script>
+이 아래에
+ㅡ
+    {% include 'snippets/pagination.html' %}
+ㅡ
+이거 적어주고
+
+
+
+
+
+<snippets> - 코드 조각이라는 뜻
+
+templates/snippets/pagination.html 폴더와 파일 생성해주기
+ㅡ
+    <div class="text-center my-5">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}"
+               class="btn btn-secondary rounded-pill">
+                {{ page_obj.previous_page_number }}
+            </a>
+        {% endif %}
+            <a href="#"
+               class="btn btn-dark rounded-pill">
+                {{ page_obj.number }}
+            </a>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}"
+               class="btn btn-secondary rounded-pill">
+                {{ page_obj.next_page_number }}
+            </a>
+        {% endif %}
+    </div>
+ㅡ
+
+commit-push
+
+
+이러면 1페이지 당 1장만 보임.
+
+------------------------------------------------------
+
+articleapp/templates/articleapp/list.html 파일로 가서
+
+    {% include 'snippets/pagination.html' %}
+이거 아래에
+
+ㅡ
+    <div class="text-center my-5">
+        <a href="{% url 'articleapp:create' %}"
+           class="btn btn-dark rounded-pill material-icons">
+            brush
+        </a>
+        <a href="{% url 'articleapp:create' %}"
+           class="btn btn-outline-dark rounded-pill px-5">
+            Create Article
+        </a>
+    </div>
+ㅡ
+이거 적어주기
+
+
+
+templates/header.html 로 가서
+
+        <span>1</span>
+이부분을
+
+ㅡ
+        <span>
+            <a href="{% url 'articleapp:list' %}">
+                Articles
+            </a>
+        </span>
+ㅡ
+
+이렇게 변경해주기
+
+
+
+commit-push
