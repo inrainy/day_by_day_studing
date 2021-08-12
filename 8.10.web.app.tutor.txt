@@ -1,0 +1,306 @@
+8.10.web.app.tutor
+
+
+python manage.py startapp commentapp
+
+터미널에서 댓글창 먼저 만들고 시작.
+
+
+
+web_app_study_6.30/settings.py
+
+파일로 들어가서
+
+'articleapp',
+이거 아래에
+ㅡ
+    'commentapp',
+ㅡ
+추가해주기
+
+
+
+
+
+web_app_study_6.30/urls.py
+
+로 들어가서
+
+    path('articles/', include('articleapp.urls')),
+아래에
+ㅡ
+    path('comments/', include('commentapp.urls')),
+ㅡ
+추가해주기
+
+
+
+
+
+commentapp/urls.py 파일 만들어주고
+
+ㅡ
+urlpatterns = [
+    
+]
+ㅡ
+
+적어주기
+
+
+
+
+
+commit-push
+
+
+-------------------------------------------------------------
+
+
+commentapp/models.py 파일로 와서
+
+ㅡ
+class Comment(models.Model):
+    writer = models.ForeignKey(User, on_delete=models.SET_NULL,
+                               related_name='comment', null=True)
+
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL,
+                                related_name='comment', null=True)
+    content = models.TextField(null=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+ㅡ
+
+작성
+from articleapp.models import Article
+from django.contrib.auth.models import User
+임포트 해주기
+
+
+
+그다음 터미널에서!!!! 
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+
+꼭 해줘야함!!!!!!!!!!
+
+
+
+commentapp/forms.py 파일 만들어주기
+
+
+ㅡ
+class CommentCreationForm(ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['content']
+ㅡ
+
+적어주기
+
+from django.forms import ModelForm
+from commentapp.models import Comment
+임포트 해주면 됨.
+
+
+
+commit - push
+
+------------------------------------------------------------------
+
+commentapp/views.py 파일로 가서
+
+
+ㅡ
+class CommentCreateView(CreateView):
+    model = Comment
+    form_class = CommentCreationForm
+    template_name = 'commentapp/create.html'
+
+    def get_success_url(self):
+        return reverse('articleapp:detail', kwargs={'pk': self.object.article.pk})
+ㅡ
+작성해주기
+
+from django.urls import reverse
+from django.views.generic import CreateView
+
+from commentapp.forms import CommentCreationForm
+from commentapp.models import Comment
+
+4개 임포트 해주기
+
+
+
+
+commentapp/urls.py파일로 와서
+
+ㅡ
+app_name = 'commentapp'
+
+urlpatterns = [
+    path('create/', CommentCreateView.as_view(), name='create'),
+]
+ㅡ
+
+작성해주기
+from django.urls import path
+
+from commentapp.views import CommentCreateView
+임포트 해주기
+
+
+
+
+commentapp/templates/commentapp/create.html 
+템플릿 폴더 만들어주고 커멘트 앱 폴더 만들어주고
+그 다음에 create html파일 만들어주기
+
+이 안에
+
+ㅡ
+{% extends 'base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Create Comment</h4>
+        </div>
+        <div>
+            <form action="{% url 'commentapp:create' %}" method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-dark rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+
+이렇게 내용 작성해주기.
+
+
+
+
+로직만들고, 라우팅 연결해주고, 템플릿 만들어 준 것으로 끝임.
+
+사이트에서
+http://127.0.0.1:8000/comments/create/
+이렇게 들어가면 커멘트를 작성하는 창으로 들어가짐
+하지만 제대로 완벽히 연결된 것이 아니기 때문에
+곧 작업을 진행할 예정
+
+
+
+
+commit-push
+
+해주기
+===========================================
+
+
+
+articleapp/templates/articleapp/detail.html 파일로 가서
+
+마지막
+        </div>
+ 이 사이에
+    </div>
+ㅡ
+        <hr>
+
+        <div class="text-center my-4">
+            {#      댓글 작성 폼 및 댓글      #}
+            {% include 'commentapp/create.html' %}
+        </div>
+ㅡ
+이거 작성
+
+
+
+articleapp/views.py 파일로 들어가서
+
+
+-
+class ArticleDetailView(DetailView, FormMixin):
+    model = Article
+    form_class = CommentCreationForm
+    context_object_name = 'target_article'
+    template_name = 'articleapp/detail.html'
+-
+
+변경
+
+from commentapp.forms import CommentCreationForm
+from django.views.generic.edit import FormMixin
+임포트 해주기
+
+
+
+
+commentapp/templates/commentapp/create.html 파일로 가서
+
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% endblock %}
+
+삭제하기!
+
+
+
+commit-push
+
+
+------------------------------------------------------------------
+
+
+commentapp/views.py 파일에서
+
+class와 def 사이에
+또 다른 함수
+ㅡ
+    def form_valid(self, form):
+        form.instance.writer = self.request.user
+        form.instance.article_id = self.request.POST.get('article_pk')
+        return super().form_valid(form)
+ㅡ
+
+작성해주기.
+from articleapp.models import Article임포트 해주기
+
+
+
+commentapp/templates/commentapp/create.html 파일로 가서
+
+{% bootstrap_form form %}
+과
+<div class="m-5">
+
+이 사이에
+
+ㅡ
+<input type="hidden"
+                       name="article_pk"
+                       value="{{ target_article.pk }}">
+ㅡ
+이거 적어주기
+
+
+commit-push
+
+
+db새로고침하고 commend db쪽 보면 댓글 내용있음,
+로그인 안한 상태에서 댓글 달면 에러 페이지 뜸.
