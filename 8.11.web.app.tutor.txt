@@ -1,0 +1,214 @@
+8.11.web.app.tutor
+
+
+
+commentapp/views.py 파일로 가서
+
+
+ㅡ
+class CommentDeleteView(DeleteView):
+    model = Comment
+    context_object_name = 'target_comment'
+    template_name = 'commentapp/delete.html'
+
+    def get_success_url(self):
+        return reverse('articleapp:detail', kwargs={'pk': self.object.article.pk})
+ㅡ
+작성해주고
+(DeleteView) 임포트 해주기
+
+
+
+commentapp/urls.py 파일로 가서
+
+ㅡ
+path('delete/<int:pk>', CommentDeleteView.as_view(), name='delete'),
+ㅡ
+추가해주고
+CommentDeleteView 임포트 해주기
+
+
+
+commentapp/templates/commentapp/delete.html 파일 만들어주기
+
+ㅡ
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="text-center mw-500 m-auto">
+        <div class="m-5">
+            <h4>Delete Comment</h4>
+        </div>
+        <div>
+            <form action="{% url 'commentapp:delete' pk=target_comment.pk %}" method="post">
+                {% csrf_token %}
+                <div class="m-5">
+                    <input type="submit"
+                       class="btn btn-dark rounded-pill px-5">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+ㅡ
+작성해주기
+
+
+
+
+
+commit-push
+
+-----------------------------------------------------------------
+
+
+commentapp/views.py 파일로 가서
+
+class CommentCreateView(CreateView)
+이 위에
+ㅡ
+@method_decorator(login_required, 'get')
+@method_decorator(login_required, 'post')
+ㅡ
+작성
+
+
+
+class CommentDeleteView(DeleteView)
+이 위에
+ㅡ
+@method_decorator(comment_ownership_required, 'get')
+@method_decorator(comment_ownership_required, 'post')
+ㅡ
+작성
+
+
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from commentapp.decorators import comment_ownership_required
+임포트
+
+
+
+
+
+commentapp/decorators.py 파일 만들어주고
+
+ㅡ
+
+def comment_ownership_required(func):
+    def decorated(request, *args, **kwargs):
+        target_comment = Comment.objects.get(pk=kwargs['pk'])
+        if target_comment.writer == request.user:
+            return func(request, *args, **kwargs)
+        else:
+            return HttpResponseForbidden()
+    return decorated
+ㅡ
+작성해주기
+from django.http import HttpResponseForbidden
+from commentapp.models import Comment
+임포트 하기
+
+
+
+commit-push
+
+-----------------------------------------------------
+
+
+=======================================
+
+
+articleapp/templates/articleapp/detail.html 파일로 간다
+
+{# 댓글 작성 폼 및 댓글 #}
+이거랑
+{% include 'commentapp/create.html' %}
+이거 사이에
+
+ㅡ
+            {% for comment in target_article.comment.all %}
+
+                <div class="comment_box">
+                    <div>
+                        <span class="NNS_B" style="font-size: 1.4rem;">
+                            {{ comment.writer.profile.nickname }}
+                        </span>
+                        <span>{{ comment.created_at }}</span>
+                    </div>
+                    <div>
+                        <p>
+                            {{ comment.content }}
+                        </p>
+                    </div>
+                    {% if comment.writer == user %}
+                    <div style="text-align: right">
+                        <a href="{% url 'commentapp:delete' pk=comment.pk %}"
+                           class="btn btn-danger rounded-pill px-5">
+                            Delete
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+
+            {% endfor %}
+ㅡ
+작성해주기
+
+
+
+static/base.css
+
+
+ㅡ
+.comment_box {
+    text-align: left;
+    border: solid;
+    border-color: #d0d0d0;
+    padding: 1rem;
+    border-radius: 1rem;
+    margin: 1rem;
+}
+ㅡ
+추가 작성
+
+commit-push
+
+
+
+-------------------------------------------------------------------
+
+
+
+web_app_study_6_30/settings.py 파일로 가서
+
+
+ㅡ
+ALLOWED_HOSTS = ["*"]
+ㅡ
+변경해주기
+
+소형기기
+
+공유기가 있는 분들도 잇고 없는 분들도 잇고 인터넷 접속도 잇고
+
+여튼 모바일에서도 접속을 할 수 있게 설정
+
+
+
+
+TIME_ZONE = 'Asia/Seoul'
+댓글 날짜를 현재시각으로
+--------------------------------------------------------------------
+
+
+
+
+
+templates/head.html 파일로 가서
+이부분은 오늘 안할듯
